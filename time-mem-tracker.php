@@ -31,8 +31,6 @@ class Time_Mem_Tracker{
     /**
      * An array of arrays, containing all the time/mem info.
      *
-     * It's public but you shouldn't really need to write to it directly.
-     *
      * @see breakpoint()
      *
      * @var array
@@ -110,18 +108,8 @@ class Time_Mem_Tracker{
     }
 
     /**
-     * A stupid helper function that unfortunately we need more
-     * than once.
-     *
-     * @param $value
-     * @return string
-     */
-    public static function _prefix_positive( $value ) {
-        return $value >= 0 ? "+$value" : $value;
-    }
-
-    /**
-     * Another stupid helper function.
+     * 123123123 => "+123,123,123"
+     * 123123123 => "123,123,123"
      *
      * @param $value
      * @param $do_prefix
@@ -133,12 +121,11 @@ class Time_Mem_Tracker{
     }
 
     /**
-     * Formats a value for displaying.
+     * Formats an element of a single breakpoint for displaying.
      *
-     * When the value represents a difference, it ensures it starts with + or -,
+     * For "delta" values, it ensures that the value starts with + or -
      *
-     * When the value represents memory in bytes, it adds some commas, so you can
-     * easily approximate how many mb of memory you are using.
+     * For memory values, adds commas.
      *
      * @param $key
      * @param $value
@@ -151,7 +138,7 @@ class Time_Mem_Tracker{
             'delta_time',
             'delta_time_total',
         ] ) ){
-            return static::_prefix_positive( $value );
+            return $value >= 0 ? "+$value" : $value;
         }
 
         // memory, totals
@@ -178,8 +165,7 @@ class Time_Mem_Tracker{
     }
 
     /**
-     * Formats most or all indexes of a breakpoint array, so
-     * that it's ready for printing.
+     * Formats all elements of a breakpoint so that they are ready for printing.
      *
      * @param $breakpoint
      * @return mixed
@@ -192,7 +178,7 @@ class Time_Mem_Tracker{
     }
 
     /**
-     * Dumb helper function
+     * Dumb helper function.
      *
      * @param $breakpoints
      * @return mixed
@@ -204,8 +190,7 @@ class Time_Mem_Tracker{
     }
 
     /**
-     * Helper function to print a row of a "table" looking sort of thing,
-     * that uses spaces instead of HTML to put things into columns.
+     * Prints an array of items using string padding to mimic table columns.
      *
      * @param array $items
      * @param int $pad_length
@@ -259,7 +244,7 @@ class Time_Mem_Tracker{
         $br = $html ? '<br>' : "\r\n";
 
         if ( $html ) {
-            $ret .= '<pre style="white-space: pre-wrap; font-family: monospace, monospace;">';
+            $ret .= $this->html_pre_tag()[0];
         }
 
         $cols = [
@@ -288,10 +273,23 @@ class Time_Mem_Tracker{
         }, $bps ) );
 
         if ( $html ) {
-            $ret .= '</pre>';
+            $ret .= $this->html_pre_tag()[1];
         }
 
         return $ret;
+    }
+
+    /**
+     * You can extend and change this if needed. Must return an array of
+     * length 2.
+     *
+     * @return array
+     */
+    public function html_pre_tag(){
+        return [
+            '<pre style="white-space: pre-wrap; font-family: monospace, monospace;">',
+            '</pre>'
+        ];
     }
 
     /**
@@ -308,7 +306,7 @@ class Time_Mem_Tracker{
         $br = $html ? '<br>' : "\r\n";
 
         if ( $html ) {
-            $ret .= '<pre style="white-space: pre-wrap; font-family: monospace, monospace;">';
+            $ret .= $this->html_pre_tag()[0];
         }
 
         $ret .= static::_print_row( [ htmlspecialchars( $this->context ), "Time", "Mem", "Peak Mem" ] );
@@ -366,7 +364,7 @@ class Time_Mem_Tracker{
         }
 
         if ( $html ) {
-            $ret .= '</pre>';
+            $ret .= $this->html_pre_tag()[1];
         }
 
         return $ret;
